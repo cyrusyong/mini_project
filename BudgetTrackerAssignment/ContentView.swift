@@ -21,9 +21,10 @@ struct ContentView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     
-                    // TODO: Show remaining budget here
-                    // Note: Budget can change color in certain cases
-                    
+                    Text("Remaining Budget: \(viewModel.remainingBudget, format: .currency(code: "USD"))")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(viewModel.budgetColor)
                     
                 }
                 .padding()
@@ -33,14 +34,26 @@ struct ContentView: View {
                 // MARK: - Add Expense Form
                 VStack(spacing: 15) {
                     
-                    // TODO: TextField for expense name
-                                        
+                    TextField("Expense name", text: $expenseName)
+                        .textFieldStyle(.roundedBorder)
                     
-                    // TODO: TextField for expense amount
-                    
+                    TextField("Amount", text: $expenseAmount)
+                        .keyboardType(.decimalPad)
+                        .textFieldStyle(.roundedBorder)
                     
                     Button {
-                        // TODO: Add expense and remember to clear the fields
+                        guard let amount = Double(expenseAmount.trimmingCharacters(in: .whitespacesAndNewlines)),
+                              !expenseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        else {
+                            return
+                        }
+
+                        viewModel.addExpense(
+                            name: expenseName.trimmingCharacters(in: .whitespacesAndNewlines),
+                            amount: amount
+                        )
+                        expenseName = ""
+                        expenseAmount = ""
                     } label: {
                         Text("Add Expense")
                             .frame(maxWidth: .infinity, maxHeight: 50)
@@ -61,16 +74,35 @@ struct ContentView: View {
                     Text("Expenses")
                         .font(.headline)
                     
-                    // TODO: If there are no expenses, show "No expenses yet"
-                                                            
+                    if viewModel.expenses.isEmpty {
+                        Text("No expenses yet")
+                            .foregroundStyle(.secondary)
+                    }
+                    
                     ForEach($viewModel.expenses) { $expense in
-                        // TODO: Wrap each expense in a NavigationLink
-                        // Destination should be ExpenseDetailView(expense: $expense, viewModel: viewModel)
-                        
-                        // Inside the row, display:
-                        // - Expense name
-                        // - Expense amount
-                        // - A delete button
+                        NavigationLink {
+                            ExpenseDetailView(expense: $expense, viewModel: viewModel)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(expense.name)
+                                        .fontWeight(.semibold)
+                                    Text(expense.amount, format: .currency(code: "USD"))
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Button {
+                                    viewModel.removeExpense(expense: expense)
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .foregroundStyle(.red)
+                                }
+                                .buttonStyle(.borderless)
+                            }
+                        }
                     }
                 }
                 .padding()
