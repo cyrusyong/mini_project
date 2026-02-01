@@ -11,20 +11,27 @@ import SwiftUI
     var expenses: [Expense] = []
     
     var remainingBudget: Double {
-        500.0 - expenses.reduce(0) { $0 + $1.amount }
+        var balance: Double = 500.0
+        for expense in expenses {
+            balance -= expense.amount
+        }
+        return balance
     }
     
     var budgetColor: Color {
-        remainingBudget >= 0 ? .green : .red
+        if remainingBudget >= 0 {
+            return .green
+        }
+        return .red
     }
     
     func addExpense(name: String, amount: Double) {
-        let newExpense = Expense(name: name, amount: amount)
-        expenses.append(newExpense)
+        expenses.append(Expense(name: name, amount: amount))
     }
     
     func removeExpense(expense: Expense) {
-        guard let index = expenses.firstIndex(of: expense) else { return }
-        expenses.remove(at: index)
+        if let index = expenses.firstIndex(of: expense) {
+            expenses.remove(at: index)
+        }
     }
 }

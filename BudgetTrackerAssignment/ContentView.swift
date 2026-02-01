@@ -42,18 +42,13 @@ struct ContentView: View {
                         .textFieldStyle(.roundedBorder)
                     
                     Button {
-                        guard let amount = Double(expenseAmount.trimmingCharacters(in: .whitespacesAndNewlines)),
-                              !expenseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                        else {
-                            return
+                        let name = expenseName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let amountText = expenseAmount.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if let amount = Double(amountText), !name.isEmpty {
+                            viewModel.addExpense(name: name, amount: amount)
+                            expenseName = ""
+                            expenseAmount = ""
                         }
-
-                        viewModel.addExpense(
-                            name: expenseName.trimmingCharacters(in: .whitespacesAndNewlines),
-                            amount: amount
-                        )
-                        expenseName = ""
-                        expenseAmount = ""
                     } label: {
                         Text("Add Expense")
                             .frame(maxWidth: .infinity, maxHeight: 50)
@@ -97,7 +92,7 @@ struct ContentView: View {
                                 Button {
                                     viewModel.removeExpense(expense: expense)
                                 } label: {
-                                    Image(systemName: "trash")
+                                    Text("delete")
                                         .foregroundStyle(.red)
                                 }
                                 .buttonStyle(.borderless)
