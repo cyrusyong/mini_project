@@ -14,9 +14,10 @@ struct ExpenseDetailView: View {
     var body: some View {
         List {
             Section(header: Text("Expense Info")) {
-                // TODO: Create a row for editing the expense name
-                
-                // TODO: Create a row for editing the expense amount
+                TextField("Name", text: $expense.name)
+
+                TextField("Amount", value: $expense.amount, format: .number)
+                    .keyboardType(.decimalPad)
             }
             
         }
